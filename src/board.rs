@@ -50,4 +50,11 @@ impl Board {
         }
         println!(" A B C D E F G H");
     }
+
+    pub fn get_piece_at(&self, row: usize, col: usize) -> Result<Option<Piece>, &'static str> {
+        if row >= 8 || col >= 8 {
+            return Err("Invalid input: row and column must be between 0 and 7");
+        }
+        Ok(self.grid[row][col])
+    }
 }
