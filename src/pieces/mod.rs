@@ -19,13 +19,22 @@ pub enum PieceType {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Piece {
-    color: Color,
-    piece_type: PieceType,
+    pub color: Color,
+    pub piece_type: PieceType,
+    pub has_moved: bool,
 }
 
 impl Piece {
     pub fn new(piece_type: PieceType, color: Color) -> Self {
-        Self { piece_type, color }
+        Self {
+            piece_type,
+            color,
+            has_moved: false,
+        }
+    }
+
+    pub fn set_moved(&mut self) {
+        self.has_moved = true;
     }
 
     pub fn symbol(&self) -> char {
@@ -57,13 +66,35 @@ impl Movable for Piece {
 
         match self.piece_type {
             PieceType::Pawn => {
-                let col_cond = start_col == end_col;
+                let row_diff = end_row as isize - start_row as isize;
+                let col_diff = end_col as isize - start_col as isize;
                 if self.color == Color::White {
-                    (start_row == 6 && end_row == 4 && col_cond)
-                        || (end_row == start_row - 1 && col_cond)
+                    // Forward moves => row_diff == +1 or +2 if hasn't moved
+                    // Diagonal capture => row_diff == +1, col_diff.abs() == 1
+                    if col_diff == 0 {
+                        if !self.has_moved {
+                            row_diff == 1 || row_diff == 2
+                        } else {
+                            row_diff == 1
+                        }
+                    } else if col_diff.abs() == 1 && row_diff == 1 {
+                        true // diagonal capture
+                    } else {
+                        false
+                    }
                 } else {
-                    (start_row == 1 && end_row == 3 && col_cond)
-                        || (end_row == start_row + 1 && col_cond)
+                    // Black => row_diff == -1 or -2; diagonal => row_diff == -1
+                    if col_diff == 0 {
+                        if !self.has_moved {
+                            row_diff == -1 || row_diff == -2
+                        } else {
+                            row_diff == -1
+                        }
+                    } else if col_diff.abs() == 1 && row_diff == -1 {
+                        true
+                    } else {
+                        false
+                    }
                 }
             }
             PieceType::Rook => start_row == end_row || start_col == end_col,

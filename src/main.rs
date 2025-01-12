@@ -1,15 +1,17 @@
-use crate::board::Board;
+use crate::board::ChessBoard;
 
 mod board;
 mod pieces;
 
 fn main() {
-    let board = Board::new();
+    let mut board = ChessBoard::new();
+    println!("Chess game initialized.");
+    println!("White starts first.");
     board.display();
 
-    match board.get_piece_at(0, 0) {
-        Ok(Some(piece)) => println!("Found piece: {:?}", piece),
-        Ok(None) => println!("No piece found at this position."),
-        Err(e) => println!("Error: {}", e),
+    if board.make_move((6, 0), (5, 0)) {
+        println!("Move successful")
+    } else {
+        println!("Invalid move")
     }
 }
